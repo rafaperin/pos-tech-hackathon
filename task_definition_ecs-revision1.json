@@ -1,0 +1,110 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:604623258149:task-definition/hackathon:1",
+    "containerDefinitions": [
+        {
+            "name": "hackathon",
+            "image": "604623258149.dkr.ecr.us-east-1.amazonaws.com/hackathon:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "hackathon-8000-tcp",
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "POSTGRES_USER",
+                    "value": "postgres"
+                },
+                {
+                    "name": "POSTGRES_PASS",
+                    "value": "Postgres2024!"
+                },
+                {
+                    "name": "POSTGRES_DB",
+                    "value": "hackathon"
+                },
+                {
+                    "name": "POSTGRES_HOST",
+                    "value": "hackathon.c10ffknjsfsb.us-east-1.rds.amazonaws.com"
+                },
+                {
+                    "name": "JWT_SECRET",
+                    "value": "ws+:J#~&[BBBh#2V@E!%eARA8WuB7/i+7B0z"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "/ecs/hackathon",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "hackathon",
+    "taskRoleArn": "arn:aws:iam::604623258149:role/my-ecs-execution-role",
+    "executionRoleArn": "arn:aws:iam::604623258149:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 1,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.29"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2024-03-24T19:07:15.580Z",
+    "registeredBy": "arn:aws:iam::604623258149:root",
+    "tags": []
+}

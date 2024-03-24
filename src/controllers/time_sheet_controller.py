@@ -4,6 +4,7 @@ import uuid
 from src.adapters.time_sheet_json_adapter import time_sheet_list_to_json, time_sheet_to_json, user_records_to_json
 from src.config.errors import ResourceNotFound, RepositoryError
 from src.entities.schemas.time_sheet_dto import CreateTimeSheetDTO, ChangeTimeSheetDTO
+from src.external.mailing_client import MailingClient
 from src.gateways.postgres_gateways.time_sheet_gateway import PostgresDBTimeSheetRepository
 from src.usecases.time_sheet_usecase import TimeSheetUseCase
 
@@ -49,7 +50,10 @@ class TimeSheetController:
                 records, registration_number, date
             )
             result = user_records_to_json(records, registration_number, worked_hours)
-        except Exception:
+
+            MailingClient.send(str(result))
+        except Exception as e:
+            print(e)
             raise RepositoryError.get_operation_failed()
 
         return {"result": result}

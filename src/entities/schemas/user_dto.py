@@ -15,59 +15,34 @@ class UserDTO(CamelModel):
     created_at: datetime.datetime
     modified_at: datetime.datetime
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "user_id": "00000000-0000-0000-0000-000000000000",
-                "cpf": "000.000.000-00",
-                "first_name": "Test",
-                "last_name": "User",
-                "email": "test@email.com",
-                "phone": "(11) 99999-9999"
-            }
-        }
+
+class UserResponseDTO(CamelModel):
+    user_id: uuid.UUID
+    username: str
+    registration_number: int
+    created_at: datetime.datetime
+    modified_at: datetime.datetime
 
 
 class CreateUserDTO(CamelModel):
-    cpf: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
-    email: Optional[EmailStr]
-    phone: Optional[str]
+    username: Optional[str]
+    password: Optional[str]
 
-    class Config:
-        schema_extra = {
-            "example": {
-                "cpf": "000.000.000-00",
-                "first_name": "Test",
-                "last_name": "User",
-                "email": "test@email.com",
-                "phone": "(11) 99999-9999"
-            }
-        }
+
+class AuthenticateUserDTO(CamelModel):
+    username: Optional[str]
+    password: Optional[str]
 
 
 class ChangeUserDTO(CamelModel):
-    first_name: Optional[str]
-    last_name: Optional[str]
-    email: Optional[EmailStr]
-    phone: Optional[str]
-
-    class Config:
-        schema_extra = {
-            "example": {
-                "first_name": "Test",
-                "last_name": "User",
-                "email": "test@email.com",
-                "phone": "(11) 99999-9999"
-            }
-        }
+    username: Optional[str]
+    password: Optional[str]
 
 
 class UserDTOResponse(CamelModel):
-    result: UserDTO
+    result: UserResponseDTO
 
 
 class UserDTOListResponse(CamelModel):
-    result: List[UserDTO]
+    result: List[UserResponseDTO]
 

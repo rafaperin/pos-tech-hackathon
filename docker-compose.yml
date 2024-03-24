@@ -1,0 +1,41 @@
+version: "3"
+services:
+#  hackathon-app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: hackathon-app
+#    environment:
+#      POSTGRES_USER: "admin"
+#      POSTGRES_PASS: "admin"
+#      POSTGRES_DB: "hackathon"
+#      POSTGRES_HOST: "localhost"
+#      JWT_SECRET: "ws+:J#~&[BBBh#2V@E!%eARA8WuB7/i+7B0z"
+#    ports:
+#      - "8000:8000"
+#    networks:
+#      - hackathon-network
+
+  postgres:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./create_tables.sql:/docker-entrypoint-initdb.d/create_hackathon_tables.sql
+    environment:
+      POSTGRES_PASSWORD: "admin"
+      POSTGRES_USER: "admin"
+      POSTGRES_DB: "hackathon"
+    expose:
+    - "5432"
+    command: -p 5432
+    ports:
+      - "5432:5432"
+    networks:
+      - hackathon-network
+
+volumes:
+  pgdata:
+
+networks:
+  hackathon-network:
+    driver: bridge

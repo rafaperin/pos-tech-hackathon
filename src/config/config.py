@@ -1,7 +1,9 @@
 import pathlib
 from dotenv import load_dotenv
-from pydantic import BaseSettings, validator, PostgresDsn
-from typing import Optional, Dict, Any
+from pydantic import PostgresDsn, computed_field
+
+from pydantic_core import MultiHostUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
@@ -13,36 +15,34 @@ class PostgresDBSettings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASS: str
     POSTGRES_HOST: str
-    POSTGRES_DB: str
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = ""
 
-    SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn]
-
-    @validator("SQLALCHEMY_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
+    @computed_field  # type: ignore[misc]
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+        return MultiHostUrl.build(
             scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASS"),
-            host=values.get("POSTGRES_HOST"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASS,
+            host=self.POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_DB,
         )
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env", env_ignore_empty=True, extra="ignore"
+    )
+
+    API_V1_STR: str = "/api/v1"
+
     JWT_SECRET: str
-    JWT_ALGORITHM: str
-
-    ENVIRONMENT: str
-
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
     db: PostgresDBSettings = PostgresDBSettings()
-
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
-        env_file_encoding = "utf-8"
 
 
 settings = Settings()

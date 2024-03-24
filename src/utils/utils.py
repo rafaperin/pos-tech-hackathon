@@ -9,7 +9,7 @@ from src.config.config import settings
 
 def camel_string(snake_str):
     first, *others = snake_str.split('_')
-    return ''.join([first.lower(), *map(str.title, others)])
+    return ''.join([first.lower(), *map(str.title, others)])  # type: ignore
 
 
 def camelize_dict(snake_dict):
@@ -28,23 +28,5 @@ def camelize_dict(snake_dict):
 class CamelModel(BaseModel):
     class Config:
         alias_generator = camel_string
-        allow_population_by_field_name = True
+        populate_by_name = True
         by_alias = True
-
-
-def decode_token(encoded_token: str):
-    try:
-        decoded_token = jwt.decode(encoded_token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-        return decoded_token
-    except Exception:
-        return {}
-
-
-def verify_jwt(token: str = Header(...)) -> None:
-    authorized = bool(decode_token(token))
-    if not authorized:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )

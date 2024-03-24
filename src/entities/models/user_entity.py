@@ -1,4 +1,5 @@
 import datetime
+import random
 import uuid
 from dataclasses import dataclass
 
@@ -13,12 +14,12 @@ class User:
     modified_at: datetime.datetime
 
     @classmethod
-    def create(cls, username: str, registration_number: int, password: str) -> "User":
+    def create(cls, username: str, password: str) -> "User":
         user_id = uuid.uuid4()
         return cls(
             user_id=user_id,
             username=username,
-            registration_number=registration_number,
+            registration_number=random.randint(10000000, 99999999),
             password=password,
             created_at=datetime.datetime.utcnow(),
             modified_at=datetime.datetime.utcnow()

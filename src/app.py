@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict
 
 import uvicorn
@@ -6,14 +7,27 @@ from fastapi.openapi.utils import get_openapi
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
-from src.api.endpoints.customer_api import router as customers_router
+from src.api.endpoints.auth_api import router as auth_router
+from src.api.endpoints.user_api import router as users_router
+from src.api.endpoints.time_sheet_api import router as time_sheet_router
 from src.api.endpoints.health_api import router as health_router
 from src.api.errors.api_errors import APIErrorMessage
 from src.config.errors import DomainError, ResourceNotFound, RepositoryError
 
 app = FastAPI()
-app.include_router(customers_router)
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(time_sheet_router)
 app.include_router(health_router)
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
 
 @app.exception_handler(DomainError)
@@ -47,9 +61,9 @@ def custom_openapi() -> Dict[str, Any]:
         return app.openapi_schema  # type: ignore
 
     openapi_schema = get_openapi(
-        title="Tech Challenge - Módulo 5",
+        title="Pós Tech - Hackathon",
         version="1.0.0",
-        description="API para lanchonete do Tech Challenge",
+        description="API para hackathon da pós tech de Software Architecture",
         routes=app.routes,
     )
     app.openapi_schema = openapi_schema
@@ -60,4 +74,4 @@ def custom_openapi() -> Dict[str, Any]:
 app.openapi = custom_openapi  # type: ignore
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8004)
+    uvicorn.run(app, host="localhost", port=8000)

@@ -67,7 +67,7 @@ def get_password_hash(password: str) -> str:
 
 def decode_token(encoded_token: str):
     try:
-        decoded_token = jwt.decode(encoded_token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        decoded_token = jwt.decode(encoded_token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM])
         return decoded_token
     except Exception:
         return {}

@@ -7,6 +7,7 @@ from src.api.errors.api_errors import APIErrorMessage
 from src.config import security
 from src.config.errors import RepositoryError, ResourceNotFound
 from src.controllers.time_sheet_controller import TimeSheetController
+from src.entities.errors.time_sheet_error import TimeSheetError
 from src.entities.schemas.time_sheet_dto import TimeSheetDTOResponse, CreateTimeSheetDTO, \
     ChangeTimeSheetDTO, TimeSheetDTOListResponse
 
@@ -34,14 +35,18 @@ async def get_all_time_sheet_records() -> dict:
 @router.get(
     "/time-sheets/user/{registration_number}/date",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(security.validate_token)],
+    dependencies=[Depends(security.get_current_user)],
     responses={400: {"model": APIErrorMessage},
                404: {"model": APIErrorMessage},
                500: {"model": APIErrorMessage}}
 )
 async def get_user_worked_hours_by_date(
-    registration_number: int, day: int, month: int, year: int
+    registration_number: int, day: int, month: int, year: int, current_user: dict = Depends(security.get_current_user)
 ) -> dict:
+    print(registration_number)
+    print(current_user["registration_number"])
+    if current_user["registration_number"] != registration_number:
+        raise TimeSheetError.insufficient_permissions()
     date = datetime.datetime(year, month, day)
     try:
         result = await TimeSheetController.get_user_records_by_date(registration_number, date)
@@ -55,15 +60,19 @@ async def get_user_worked_hours_by_date(
 @router.get(
     "/time-sheets/user/{registration_number}/month",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(security.validate_token)],
+    dependencies=[Depends(security.get_current_user)],
     responses={400: {"model": APIErrorMessage},
                404: {"model": APIErrorMessage},
                500: {"model": APIErrorMessage}}
 )
 async def get_user_worked_hours_by_month(
-    registration_number: int, month: int, year: int
+    registration_number: int, month: int, year: int, current_user: dict = Depends(security.get_current_user)
 ) -> dict:
+    if current_user["registration_number"] != registration_number:
+        raise TimeSheetError.insufficient_permissions()
+
     date = datetime.datetime(year, month, 1)
+
     try:
         result = await TimeSheetController.get_user_records_by_month(registration_number, date)
     except Exception as e:
@@ -130,7 +139,7 @@ async def change_time_sheet_record(
     request: ChangeTimeSheetDTO
 ) -> dict:
     try:
-        result = await TimeSheetController.change_time_sheet_record(record_id, request)
+        result = await TimeSheetController.change_time_sheet_record_data(record_id, request)
     except Exception as e:
         print(e)
         raise RepositoryError.save_operation_failed()
